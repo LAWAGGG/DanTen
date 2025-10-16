@@ -78,13 +78,21 @@ export default function Food() {
             ? food.description
             : "Menu spesial dari DanTen";
 
-        // Menyesuaikan pesan berdasarkan metode pembayaran dan data form
+        // Cek apakah deskripsi mengandung karakter , / atau &
+        const hasOptions = /[,&/]/.test(description);
+
+        // Menambahkan teks "Pilih jenisnya" jika ada tanda-tanda varian
+        const chooseTypeText = hasOptions ? "\n\nPilih jenisnya:" : "";
+
         const paymentText = method === 'cash' ? "Metode Pembayaran: CASH" : "Metode Pembayaran: QRIS";
-        // Format pesan baru sesuai permintaan
-        const message = `Saya mau pesan ${food.name} (${quantity} pcs)\n\nDeskripsi: ${description}\n\n${paymentText}\n\nNama: ${name}\nKelas: ${classInfo}\n\n*[ORDER DANUSAN OSIS]*`;
+
+        // Format pesan baru
+        const message = `Saya mau pesan ${food.name} (${quantity} pcs)\n\nDeskripsi: ${description}${chooseTypeText}\n\n${paymentText}\n\nNama: ${name}\nKelas: ${classInfo}\n\n*[ORDER DANUSAN OSIS]*`;
+
         const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");
     };
+
 
     if (loading) {
         return (
@@ -436,22 +444,20 @@ export default function Food() {
                                 <div className="space-y-2 mb-4">
                                     <button
                                         onClick={() => setPaymentMethod('cash')}
-                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                                            paymentMethod === 'cash'
+                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${paymentMethod === 'cash'
                                                 ? 'bg-green-500 text-white'
                                                 : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         💰 Cash
                                     </button>
 
                                     <button
                                         onClick={() => setPaymentMethod('qris')}
-                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                                            paymentMethod === 'qris'
+                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${paymentMethod === 'qris'
                                                 ? 'bg-green-500 text-white'
                                                 : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         📱 QRIS
                                     </button>
@@ -475,11 +481,10 @@ export default function Food() {
                                         onClick={confirmOrder}
                                         // Disable jika belum semua form dan metode dipilih
                                         disabled={!paymentMethod || !orderName.trim() || !orderClass.trim() || orderQuantity < 1}
-                                        className={`flex-1 py-3 px-4 rounded-xl font-bold transition-colors duration-200 ${
-                                            paymentMethod && orderName.trim() && orderClass.trim() && orderQuantity >= 1
+                                        className={`flex-1 py-3 px-4 rounded-xl font-bold transition-colors duration-200 ${paymentMethod && orderName.trim() && orderClass.trim() && orderQuantity >= 1
                                                 ? 'bg-orange-500 text-white hover:bg-orange-600'
                                                 : 'bg-orange-300 text-gray-500 cursor-not-allowed'
-                                        }`}
+                                            }`}
                                     >
                                         Konfirmasi Pesanan
                                     </button>
