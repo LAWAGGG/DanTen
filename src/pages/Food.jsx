@@ -6,13 +6,18 @@ export default function Food() {
     const [selectedFood, setSelectedFood] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("all");
-    // State baru untuk metode pembayaran
+    // State untuk metode pembayaran
     const [paymentMethod, setPaymentMethod] = useState(null); // null, 'cash', atau 'qris'
     const [showPaymentModal, setShowPaymentModal] = useState(false); // Untuk menampilkan modal pemilihan metode
     const [currentFoodForOrder, setCurrentFoodForOrder] = useState(null); // Untuk menyimpan produk yang akan dipesan
 
+    // State baru untuk data formulir
+    const [orderName, setOrderName] = useState('');
+    const [orderClass, setOrderClass] = useState('');
+    const [orderQuantity, setOrderQuantity] = useState(1); // Default ke 1
+
     useEffect(() => {
-        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json  ") // Perhatikan spasi di akhir URL, mungkin ini typo?
+        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json    ")
             .then((response) => response.json())
             .then((data) => {
                 setFoods(data);
@@ -42,27 +47,41 @@ export default function Food() {
     const initiateOrder = (food) => {
         setCurrentFoodForOrder(food);
         setPaymentMethod(null); // Reset metode sebelumnya
+        // Reset form
+        setOrderName('');
+        setOrderClass('');
+        setOrderQuantity(1);
         setShowPaymentModal(true);
     };
 
-    // Fungsi untuk menangani konfirmasi pesanan setelah memilih metode
+    // Fungsi untuk menangani konfirmasi pesanan setelah memilih metode dan mengisi form
     const confirmOrder = () => {
+        // Validasi sederhana
+        if (!currentFoodForOrder || !paymentMethod || !orderName.trim() || !orderClass.trim() || orderQuantity < 1) {
+            alert('Silakan lengkapi semua data: Nama, Kelas, Jumlah, dan Metode Pembayaran.');
+            return;
+        }
         if (currentFoodForOrder && paymentMethod) {
-            handleOrder(currentFoodForOrder, paymentMethod);
+            handleOrder(currentFoodForOrder, paymentMethod, orderName, orderClass, orderQuantity);
             setShowPaymentModal(false);
             setCurrentFoodForOrder(null);
             setPaymentMethod(null);
+            // Reset form setelah pesanan dikirim
+            setOrderName('');
+            setOrderClass('');
+            setOrderQuantity(1);
         }
     };
 
-    const handleOrder = (food, method) => {
+    const handleOrder = (food, method, name, classInfo, quantity) => {
         const description = food.description && food.description !== "null"
             ? food.description
             : "Menu spesial dari DanTen";
 
-        // Menyesuaikan pesan berdasarkan metode pembayaran
-        const paymentText = method === 'cash' ? "**Metode Pembayaran: CASH**" : "**Metode Pembayaran: QRIS**";
-        const message = `Halo! Saya mau pesan:\n\n🍱 *${food.name}*\n💰 ${food.price}\n📝 ${description}\n\n${paymentText}\n\n_*[ORDER DANUSAN OSIS]*_`;
+        // Menyesuaikan pesan berdasarkan metode pembayaran dan data form
+        const paymentText = method === 'cash' ? "Metode Pembayaran: CASH" : "Metode Pembayaran: QRIS";
+        // Format pesan baru sesuai permintaan
+        const message = `Saya mau pesan ${food.name} (${quantity} pcs)\n\nDeskripsi: ${description}\n\n${paymentText}\n\nNama: ${name}\nKelas: ${classInfo}\n\n*[ORDER DANUSAN OSIS]*`;
         const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");
     };
@@ -359,7 +378,7 @@ export default function Food() {
                 )}
             </motion.main>
 
-            {/* Modal Pemilihan Metode Pembayaran (baru) */}
+            {/* Modal Pemilihan Metode Pembayaran & Form (baru) */}
             <AnimatePresence>
                 {showPaymentModal && (
                     <motion.div
@@ -367,7 +386,6 @@ export default function Food() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                        // onClick={() => setShowPaymentModal(false)} // Tidak menutup jika klik luar
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
@@ -377,39 +395,77 @@ export default function Food() {
                             onClick={(e) => e.stopPropagation()} // Jangan tutup jika klik di dalam modal
                         >
                             <div className="p-6">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Pilih Metode Pembayaran</h2>
-                                <p className="text-gray-600 mb-6 text-center">Untuk pesanan: <strong>{currentFoodForOrder?.name}</strong></p>
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Pesan Sekarang</h2>
+                                <p className="text-gray-600 mb-4 text-center">Untuk pesanan: <strong>{currentFoodForOrder?.name}</strong></p>
 
-                                <div className="space-y-4">
+                                {/* Form Input */}
+                                <div className="space-y-4 mb-4">
+                                    <div>
+                                        <label className="block text-gray-700 mb-1">Nama Lengkap</label>
+                                        <input
+                                            type="text"
+                                            value={orderName}
+                                            onChange={(e) => setOrderName(e.target.value)}
+                                            placeholder="Masukkan nama kamu"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 mb-1">Kelas</label>
+                                        <input
+                                            type="text"
+                                            value={orderClass}
+                                            onChange={(e) => setOrderClass(e.target.value)}
+                                            placeholder="Misal: X RPL"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 mb-1">Jumlah (Pcs)</label>
+                                        <input
+                                            type="number"
+                                            value={orderQuantity}
+                                            onChange={(e) => setOrderQuantity(Math.max(1, parseInt(e.target.value)))}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Pemilihan Metode Pembayaran */}
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Metode Pembayaran</h3>
+                                <div className="space-y-2 mb-4">
                                     <button
                                         onClick={() => setPaymentMethod('cash')}
-                                        className={`w-full py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl ${
+                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                                             paymentMethod === 'cash'
-                                                ? 'bg-green-500 text-white' // Jika dipilih, warna hijau
-                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200' // Warna default
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                                         }`}
                                     >
-                                        💰 Bayar Cash
+                                        💰 Cash
                                     </button>
 
                                     <button
                                         onClick={() => setPaymentMethod('qris')}
-                                        className={`w-full py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl ${
+                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                                             paymentMethod === 'qris'
-                                                ? 'bg-green-500 text-white' // Jika dipilih, warna hijau
-                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200' // Warna default
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                                         }`}
                                     >
-                                        📱 Bayar QRIS
+                                        📱 QRIS
                                     </button>
                                 </div>
 
-                                <div className="flex space-x-3 mt-6">
+                                <div className="flex space-x-3 mt-2">
                                     <button
                                         onClick={() => {
                                             setShowPaymentModal(false);
                                             setCurrentFoodForOrder(null);
                                             setPaymentMethod(null);
+                                            setOrderName('');
+                                            setOrderClass('');
+                                            setOrderQuantity(1);
                                         }}
                                         className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-xl font-semibold hover:bg-gray-300 transition-colors duration-200"
                                     >
@@ -417,9 +473,10 @@ export default function Food() {
                                     </button>
                                     <button
                                         onClick={confirmOrder}
-                                        disabled={!paymentMethod} // Disable jika belum memilih metode
+                                        // Disable jika belum semua form dan metode dipilih
+                                        disabled={!paymentMethod || !orderName.trim() || !orderClass.trim() || orderQuantity < 1}
                                         className={`flex-1 py-3 px-4 rounded-xl font-bold transition-colors duration-200 ${
-                                            paymentMethod
+                                            paymentMethod && orderName.trim() && orderClass.trim() && orderQuantity >= 1
                                                 ? 'bg-orange-500 text-white hover:bg-orange-600'
                                                 : 'bg-orange-300 text-gray-500 cursor-not-allowed'
                                         }`}
