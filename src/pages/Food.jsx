@@ -179,7 +179,7 @@ export default function Food() {
                         transition={{ delay: 0.2, duration: 0.8 }}
                     >
                         <motion.h1
-                            className="font-serif relative inline-block text-6xl font-bold md:text-9xl text-orange-800 drop-shadow-sm flex justify-center"
+                            className="font-serif relative inline-block text-6xl font-bold md:text-9xl text-orange-700 drop-shadow-sm flex justify-center items-baseline"
                         >
                             {["D", "a", "n", "T", "e", "n"].map((letter, index) => (
                                 <motion.span
@@ -191,19 +191,31 @@ export default function Food() {
                                         duration: 0.5,
                                         ease: "easeOut"
                                     }}
-                                    className="inline-block"
+                                    className={`inline-block ${index >= 3 ? 'relative top-4 text-orange-900 md:top-4' : ''}`}
                                 >
                                     {letter}
                                 </motion.span>
                             ))}
 
+                            {/* Double Underline untuk mengikuti kedua bagian */}
                             <motion.span
-                                className="absolute bottom-0 left-0 h-[5px] bg-orange-600 rounded-full"
+                                className="absolute bottom-0 left-0 h-[5px] bg-orange-800 rounded-full"
                                 initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
+                                animate={{ width: "50%" }} // Hanya sampai "Dan"
                                 transition={{
                                     delay: 0.9,
-                                    duration: 1,
+                                    duration: 0.6,
+                                    ease: "easeInOut"
+                                }}
+                            ></motion.span>
+
+                            <motion.span
+                                className="absolute top-18 md:top-34 left-[53%] h-[5px] bg-orange-600 rounded-full"
+                                initial={{ width: 0 }}
+                                animate={{ width: "45%" }} // Mulai dari posisi "Ten"
+                                transition={{
+                                    delay: 1.1,
+                                    duration: 0.6,
                                     ease: "easeInOut"
                                 }}
                             ></motion.span>
@@ -271,9 +283,9 @@ export default function Food() {
                             key={food.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ 
-                                delay: 1.5 + (index * 0.1), 
-                                duration: 0.5 
+                            transition={{
+                                delay: 1.5 + (index * 0.1),
+                                duration: 0.5
                             }}
                             className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                         >
