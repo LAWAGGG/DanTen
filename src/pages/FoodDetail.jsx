@@ -304,7 +304,7 @@ export default function FoodDetail() {
                                         type="text"
                                         value={orderData.kelas}
                                         onChange={(e) => handleInputChange('kelas', e.target.value)}
-                                        placeholder="Contoh: X RPL 1"
+                                        placeholder="Contoh: XI RPL"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                                         required
                                         disabled={submitting}
