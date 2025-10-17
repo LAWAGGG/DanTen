@@ -241,7 +241,7 @@ export default function FoodDetail() {
                                         key={index}
                                         className="bg-orange-100 text-orange-700 text-sm px-3 py-1 rounded-full font-medium"
                                     >
-                                        #{cat}
+                                        {cat}
                                     </span>
                                 ))}
                             </motion.div>
