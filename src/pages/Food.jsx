@@ -1,23 +1,14 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-export default function Food() {
+export default function FoodList() {
     const [foods, setFoods] = useState([]);
-    const [selectedFood, setSelectedFood] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("all");
-    // State untuk metode pembayaran
-    const [paymentMethod, setPaymentMethod] = useState(null); // null, 'cash', atau 'qris'
-    const [showPaymentModal, setShowPaymentModal] = useState(false); // Untuk menampilkan modal pemilihan metode
-    const [currentFoodForOrder, setCurrentFoodForOrder] = useState(null); // Untuk menyimpan produk yang akan dipesan
-
-    // State baru untuk data formulir
-    const [orderName, setOrderName] = useState('');
-    const [orderClass, setOrderClass] = useState('');
-    const [orderQuantity, setOrderQuantity] = useState(1); // Default ke 1
 
     useEffect(() => {
-        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json    ")
+        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json")
             .then((response) => response.json())
             .then((data) => {
                 setFoods(data);
@@ -42,57 +33,6 @@ export default function Food() {
         : foods.filter(food =>
             food.category && food.category.includes(selectedCategory)
         );
-
-    // Fungsi untuk menangani klik tombol pesan, menampilkan modal pemilihan metode
-    const initiateOrder = (food) => {
-        setCurrentFoodForOrder(food);
-        setPaymentMethod(null); // Reset metode sebelumnya
-        // Reset form
-        setOrderName('');
-        setOrderClass('');
-        setOrderQuantity(1);
-        setShowPaymentModal(true);
-    };
-
-    // Fungsi untuk menangani konfirmasi pesanan setelah memilih metode dan mengisi form
-    const confirmOrder = () => {
-        // Validasi sederhana
-        if (!currentFoodForOrder || !paymentMethod || !orderName.trim() || !orderClass.trim() || orderQuantity < 1) {
-            alert('Silakan lengkapi semua data: Nama, Kelas, Jumlah, dan Metode Pembayaran.');
-            return;
-        }
-        if (currentFoodForOrder && paymentMethod) {
-            handleOrder(currentFoodForOrder, paymentMethod, orderName, orderClass, orderQuantity);
-            setShowPaymentModal(false);
-            setCurrentFoodForOrder(null);
-            setPaymentMethod(null);
-            // Reset form setelah pesanan dikirim
-            setOrderName('');
-            setOrderClass('');
-            setOrderQuantity(1);
-        }
-    };
-
-    const handleOrder = (food, method, name, classInfo, quantity) => {
-        const description = food.description && food.description !== "null"
-            ? food.description
-            : "Menu spesial dari DanTen";
-
-        // Cek apakah deskripsi mengandung karakter , / atau &
-        const hasOptions = /[,&/]/.test(description);
-
-        // Menambahkan teks "Pilih jenisnya" jika ada tanda-tanda varian
-        const chooseTypeText = hasOptions ? "\n\nPilih jenisnya:" : "";
-
-        const paymentText = method === 'cash' ? "Metode Pembayaran: CASH" : "Metode Pembayaran: QRIS";
-
-        // Format pesan baru
-        const message = `Saya mau pesan ${food.name} (${quantity} pcs)\n\nDeskripsi: ${description}${chooseTypeText}\n\n${paymentText}\n\nNama: ${name}\nKelas: ${classInfo}\n\n*[ORDER DANUSAN OSIS]*`;
-
-        const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, "_blank");
-    };
-
 
     if (loading) {
         return (
@@ -132,7 +72,7 @@ export default function Food() {
 
                     <div className="absolute inset-0 bg-gradient-to-b from-orange-50/70 to-orange-200/60"></div>
 
-                    {/* Floating Elements dengan Fade In */}
+                    {/* Floating Elements */}
                     <motion.div
                         className="absolute hidden md:block top-20 left-7 md:top-20 md:left-100 text-4xl md:text-6xl"
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -221,7 +161,7 @@ export default function Food() {
                         </motion.div>
                     </motion.div>
 
-                    {/* Title dengan Fade In */}
+                    {/* Title */}
                     <motion.div
                         className="relative z-10"
                         initial={{ opacity: 0, y: 20 }}
@@ -247,11 +187,10 @@ export default function Food() {
                                 </motion.span>
                             ))}
 
-                            {/* Double Underline untuk mengikuti kedua bagian */}
                             <motion.span
                                 className="absolute bottom-0 left-0 h-[5px] bg-orange-800 rounded-full"
                                 initial={{ width: 0 }}
-                                animate={{ width: "50%" }} // Hanya sampai "Dan"
+                                animate={{ width: "50%" }}
                                 transition={{
                                     delay: 0.9,
                                     duration: 0.6,
@@ -262,7 +201,7 @@ export default function Food() {
                             <motion.span
                                 className="absolute top-18 md:top-34 left-[53%] h-[5px] bg-orange-600 rounded-full"
                                 initial={{ width: 0 }}
-                                animate={{ width: "45%" }} // Mulai dari posisi "Ten"
+                                animate={{ width: "45%" }}
                                 transition={{
                                     delay: 1.1,
                                     duration: 0.6,
@@ -273,7 +212,7 @@ export default function Food() {
                     </motion.div>
                 </div>
 
-                {/* Category Select Section dengan Fade In */}
+                {/* Category Select */}
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -281,7 +220,6 @@ export default function Food() {
                     className="bg-white/70 backdrop-blur-md border-t border-orange-200 py-6"
                 >
                     <div className="max-w-6xl mx-auto px-4">
-                        {/* Mobile view: Centered below banner */}
                         <div className="flex flex-col items-center md:hidden">
                             <label className="text-orange-700 font-semibold mb-3 text-lg">
                                 Pilih Kategori:
@@ -299,7 +237,6 @@ export default function Food() {
                             </select>
                         </div>
 
-                        {/* Desktop view: Moved to right side, looks clean */}
                         <div className="hidden md:flex justify-end items-center">
                             <label className="text-orange-700 font-semibold mr-3 text-lg">
                                 Kategori:
@@ -320,7 +257,7 @@ export default function Food() {
                 </motion.div>
             </header>
 
-            {/* Main Content dengan Fade In */}
+            {/* Main Content */}
             <motion.main
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -339,37 +276,30 @@ export default function Food() {
                             }}
                             className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                         >
-                            {/* Image */}
-                            <div
-                                className="h-60 sm:h-80 bg-gray-100 cursor-pointer overflow-hidden"
-                                onClick={() => setSelectedFood(food)}
-                            >
-                                <img
-                                    src={food.image_url}
-                                    alt={food.name}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                />
-                            </div>
-
-                            {/* Content */}
-                            <div className="p-5">
-                                <div className="flex justify-between items-start mb-3">
-                                    <h3 className="font-bold text-gray-800 text-lg leading-tight flex-1">
-                                        {food.name}
-                                    </h3>
-                                    <span className="text-orange-600 font-bold text-sm bg-orange-50 px-3 py-1 rounded-full whitespace-nowrap ml-2">
-                                        {food.price}
-                                    </span>
+                            <Link to={`/food/${food.id}`}>
+                                <div className="h-60 sm:h-80 bg-gray-100 cursor-pointer overflow-hidden">
+                                    <img
+                                        src={food.image_url}
+                                        alt={food.name}
+                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                    />
                                 </div>
 
-                                {/* Tombol Pesan Sekarang sekarang memicu modal pemilihan metode */}
-                                <button
-                                    onClick={() => initiateOrder(food)}
-                                    className="w-full bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl"
-                                >
-                                    🛒 Pesan Sekarang
-                                </button>
-                            </div>
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="font-bold text-gray-800 text-lg leading-tight flex-1">
+                                            {food.name}
+                                        </h3>
+                                        <span className="text-orange-600 font-bold text-sm bg-orange-50 px-3 py-1 rounded-full whitespace-nowrap ml-2">
+                                            {food.price}
+                                        </span>
+                                    </div>
+
+                                    <div className="w-full bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold text-center">
+                                        🛒 Lihat Detail & Pesan
+                                    </div>
+                                </div>
+                            </Link>
                         </motion.div>
                     ))}
                 </div>
@@ -386,186 +316,6 @@ export default function Food() {
                 )}
             </motion.main>
 
-            {/* Modal Pemilihan Metode Pembayaran & Form (baru) */}
-            <AnimatePresence>
-                {showPaymentModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
-                            onClick={(e) => e.stopPropagation()} // Jangan tutup jika klik di dalam modal
-                        >
-                            <div className="p-6">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Pesan Sekarang</h2>
-                                <p className="text-gray-600 mb-4 text-center">Untuk pesanan: <strong>{currentFoodForOrder?.name}</strong></p>
-
-                                {/* Form Input */}
-                                <div className="space-y-4 mb-4">
-                                    <div>
-                                        <label className="block text-gray-700 mb-1">Nama Lengkap</label>
-                                        <input
-                                            type="text"
-                                            value={orderName}
-                                            onChange={(e) => setOrderName(e.target.value)}
-                                            placeholder="Masukkan nama kamu"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-700 mb-1">Kelas</label>
-                                        <input
-                                            type="text"
-                                            value={orderClass}
-                                            onChange={(e) => setOrderClass(e.target.value)}
-                                            placeholder="Misal: X RPL"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-700 mb-1">Jumlah (Pcs)</label>
-                                        <input
-                                            type="number"
-                                            value={orderQuantity}
-                                            onChange={(e) => setOrderQuantity(Math.max(1, parseInt(e.target.value)))}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Pemilihan Metode Pembayaran */}
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Metode Pembayaran</h3>
-                                <div className="space-y-2 mb-4">
-                                    <button
-                                        onClick={() => setPaymentMethod('cash')}
-                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${paymentMethod === 'cash'
-                                                ? 'bg-green-500 text-white'
-                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        💰 Cash
-                                    </button>
-
-                                    <button
-                                        onClick={() => setPaymentMethod('qris')}
-                                        className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${paymentMethod === 'qris'
-                                                ? 'bg-green-500 text-white'
-                                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        📱 QRIS
-                                    </button>
-                                </div>
-
-                                <div className="flex space-x-3 mt-2">
-                                    <button
-                                        onClick={() => {
-                                            setShowPaymentModal(false);
-                                            setCurrentFoodForOrder(null);
-                                            setPaymentMethod(null);
-                                            setOrderName('');
-                                            setOrderClass('');
-                                            setOrderQuantity(1);
-                                        }}
-                                        className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-xl font-semibold hover:bg-gray-300 transition-colors duration-200"
-                                    >
-                                        Batal
-                                    </button>
-                                    <button
-                                        onClick={confirmOrder}
-                                        // Disable jika belum semua form dan metode dipilih
-                                        disabled={!paymentMethod || !orderName.trim() || !orderClass.trim() || orderQuantity < 1}
-                                        className={`flex-1 py-3 px-4 rounded-xl font-bold transition-colors duration-200 ${paymentMethod && orderName.trim() && orderClass.trim() && orderQuantity >= 1
-                                                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                                                : 'bg-orange-300 text-gray-500 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        Konfirmasi Pesanan
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Food Detail Modal */}
-            <AnimatePresence>
-                {selectedFood && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                        onClick={() => setSelectedFood(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="relative h-80">
-                                <img
-                                    src={selectedFood.image_url}
-                                    alt={selectedFood.name}
-                                    className="w-full h-full object-cover"
-                                />
-                                <button
-                                    onClick={() => setSelectedFood(null)}
-                                    className="absolute top-3 right-3 w-10 h-10 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80 transition-colors duration-200 text-lg"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h2 className="text-2xl font-bold text-gray-800 pr-2 flex-1">
-                                        {selectedFood.name}
-                                    </h2>
-                                    <span className="text-orange-600 text-xl font-bold whitespace-nowrap">
-                                        {selectedFood.price}
-                                    </span>
-                                </div>
-
-                                <div className="mb-4">
-                                    {selectedFood.category && selectedFood.category.map((cat, index) => (
-                                        <span
-                                            key={index}
-                                            className="inline-block bg-orange-100 text-orange-700 text-sm px-3 py-1 rounded-full mr-2 mb-2"
-                                        >
-                                            {cat}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                <p className="text-gray-600 mb-6 leading-relaxed text-lg">
-                                    {selectedFood.description && selectedFood.description !== "null"
-                                        ? selectedFood.description
-                                        : "Menu spesial DanTen yang dibuat dengan bahan-bahan fresh dan berkualitas. Cocok untuk teman belajar maupun santai bersama teman."}
-                                </p>
-
-                                <button
-                                    onClick={() => initiateOrder(selectedFood)}
-                                    className="w-full bg-orange-500 text-white py-4 px-4 rounded-xl font-bold text-lg hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-lg hover:shadow-xl"
-                                >
-                                    🛒 Pesan Sekarang
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Footer dengan Fade In */}
             <motion.footer
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
