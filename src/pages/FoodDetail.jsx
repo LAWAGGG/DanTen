@@ -27,50 +27,10 @@ export default function FoodDetail() {
             });
     }, [id]);
 
-    async function sendToSheet(data) {
-        try {
-            console.log("Mengirim data ke Google Sheets via JSON:", data);
-
-            const url = "https://script.google.com/macros/s/AKfycbwdvpG6hlaKjLt1U5pcYhCMGl36k81WJEalTqp3UQGuAEZc2V_O7FQGYneFporcEcd1og/exec";
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    // Penting untuk memicu Apps Script membaca sebagai JSON
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            // Cek status response
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log("Response dari Sheets:", result);
-            return { status: "success" };
-
-        } catch (error) {
-            console.error("Error sending JSON to sheet (fetch):", error);
-            return { status: "error", message: error.message };
-        }
-    }
-
-
-    const handleInputChange = (field, value) => {
-        setOrderData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
     // Function untuk extract harga dari string price
     const extractPrice = (priceString) => {
-        // Handle format seperti "Rp6.500 - 7.500,-" atau "Rp12.000,-"
         const priceMatch = priceString.match(/Rp\s*([0-9.,]+)/);
         if (priceMatch) {
-            // Ambil angka pertama yang ditemukan
             const price = priceMatch[1].replace(/\./g, '');
             return parseInt(price) || 0;
         }
@@ -107,27 +67,55 @@ export default function FoodDetail() {
 
         const totalHarga = calculateTotal();
 
-        // Format data untuk dikirim ke Google Sheets
-        const orderPayload = {
-            timestamp: new Date().toLocaleString('id-ID'),
-            nama: orderData.nama,
-            kelas: orderData.kelas,
-            nomor_telpon: orderData.nomor_telpon,
-            makanan: food.name,
-            jumlah_pesanan: orderData.jumlah_pesanan,
-            total_harga: totalHarga
-        };
+        // Format data untuk dikirim ke Google Sheets - SAMA PERSIS seperti contoh
+        const url = "https://script.google.com/macros/s/AKfycbzU6f5sawaOMOQifg4A1zddT1UaoDeDRBABIlXHWpb2Lbp8uOe7Bbwb-OqCP9IRf9gL/exec";
+        
+        const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}`;
+
+        console.log("Mengirim data ke Google Sheets:", bodyData);
 
         try {
+            // Kirim ke Google Sheets - SAMA PERSIS seperti contoh
+            const sheetResponse = await fetch(url, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/x-www-form-urlencoded" 
+                },
+                body: bodyData
+            });
 
-            const sheetResult = await sendToSheet(orderPayload);
+            const result = await sheetResponse.text();
+            console.log("Response dari Google Sheets:", result);
 
-            // BUKA WhatsApp *setelah* mengirim data (meskipun tidak bisa yakin masuk ke sheet)
+            // BUKA WhatsApp setelah mengirim data
             const description = food.description && food.description !== "null"
                 ? food.description
                 : "Menu spesial dari DanTen";
 
-            const message = `Halo! Saya mau pesan:\n\n🍱 *${food.name}*\n💰 Harga: ${food.price}\n🔢 Jumlah: ${orderData.jumlah_pesanan} pcs\n💵 Total: Rp ${formatPrice(calculateTotal().toString())},-\n📝 ${description}\n\n👤 *Data Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANUSAN OSIS]*_`;
+            const message = `Halo! Saya mau pesan:\n\n🍱 *${food.name}*\n💰 Harga: ${food.price}\n🔢 Jumlah: ${orderData.jumlah_pesanan} pcs\n💵 Total: Rp ${formatPrice(totalHarga.toString())},-\n📝 ${description}\n\n👤 *Data Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANUSAN OSIS]*_`;
+
+            const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, "_blank");
+
+            // Reset form
+            setOrderData({
+                nama: '',
+                kelas: '',
+                nomor_telpon: '',
+                jumlah_pesanan: 1
+            });
+
+            alert('Pesanan berhasil dikirim ke WhatsApp! Data sudah tersimpan.');
+
+        } catch (error) {
+            console.error("Error dalam handleSubmitOrder:", error);
+            
+            // Tetap buka WhatsApp meskipun Google Sheets error
+            const description = food.description && food.description !== "null"
+                ? food.description
+                : "Menu spesial dari DanTen";
+
+            const message = `Halo! Saya mau pesan:\n\n🍱 *${food.name}*\n💰 Harga: ${food.price}\n🔢 Jumlah: ${orderData.jumlah_pesanan} pcs\n💵 Total: Rp ${formatPrice(totalHarga.toString())},-\n📝 ${description}\n\n👤 *Data Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANUSAN OSIS]*_`;
 
             const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, "_blank");
@@ -141,11 +129,14 @@ export default function FoodDetail() {
             });
 
             alert('Pesanan berhasil dikirim ke WhatsApp!');
-
-        } catch (error) {
-            console.error("Error dalam handleSubmitOrder:", error);
-            alert('Terjadi error saat mengirim pesanan. Silakan coba lagi.');
         }
+    };
+
+    const handleInputChange = (field, value) => {
+        setOrderData(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     if (loading) {
@@ -187,7 +178,7 @@ export default function FoodDetail() {
         >
             <div
                 className="fixed inset-0 bg-cover bg-center opacity-10 pointer-events-none"
-                style={{ backgroundImage: "url('./Bg.png')" }}
+                style={{ backgroundImage: "url('../Bg.png')" }}
             ></div>
 
             {/* Header */}
@@ -255,7 +246,6 @@ export default function FoodDetail() {
                                 </label>
                                 <input
                                     type="text"
-                                    name="nama"
                                     value={orderData.nama}
                                     onChange={(e) => handleInputChange('nama', e.target.value)}
                                     placeholder="Masukkan nama lengkap"
@@ -271,7 +261,6 @@ export default function FoodDetail() {
                                 </label>
                                 <input
                                     type="text"
-                                    name="kelas"
                                     value={orderData.kelas}
                                     onChange={(e) => handleInputChange('kelas', e.target.value)}
                                     placeholder="Contoh: X RPL 1"
@@ -287,7 +276,6 @@ export default function FoodDetail() {
                                 </label>
                                 <input
                                     type="tel"
-                                    name="nomor_telpon"
                                     value={orderData.nomor_telpon}
                                     onChange={(e) => handleInputChange('nomor_telpon', e.target.value)}
                                     placeholder="Contoh: 081234567890"
@@ -304,7 +292,6 @@ export default function FoodDetail() {
                                 <input
                                     type="number"
                                     min="1"
-                                    name="jumlah_pesanan"
                                     value={orderData.jumlah_pesanan}
                                     onChange={(e) => handleInputChange('jumlah_pesanan', parseInt(e.target.value) || 1)}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -330,8 +317,8 @@ export default function FoodDetail() {
                                 type="submit"
                                 disabled={!orderData.nama.trim() || !orderData.kelas.trim() || !orderData.nomor_telpon.trim()}
                                 className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 ${orderData.nama.trim() && orderData.kelas.trim() && orderData.nomor_telpon.trim()
-                                    ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-lg hover:shadow-xl'
-                                    : 'bg-orange-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-lg hover:shadow-xl'
+                                        : 'bg-orange-300 text-gray-500 cursor-not-allowed'
                                     }`}
                             >
                                 📱 Pesan Sekarang & Kirim ke WhatsApp
