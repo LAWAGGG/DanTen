@@ -400,7 +400,7 @@ export default function FoodDetail() {
                                             Memproses Pesanan...
                                         </>
                                     ) : (
-                                        '📱 Pesan Sekarang & Kirim ke WhatsApp'
+                                        '📱 Pesan Sekarang!'
                                     )}
                                 </button>
                             </motion.div>
@@ -450,7 +450,7 @@ export default function FoodDetail() {
                                 }}
                                 className="bg-green-500 text-white py-3 px-6 rounded-xl font-semibold hover:bg-green-600 transition-colors"
                             >
-                                Buka WhatsApp Sekarang
+                                Konfirmasi ke WhatsApp
                             </motion.button>
                         </motion.div>
                     </motion.div>
