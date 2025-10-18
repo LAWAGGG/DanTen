@@ -22,7 +22,6 @@ export default function FoodList() {
 
     const categories = [
         { value: "all", label: "🍽️ Semua Menu" },
-        { value: "makanan", label: "🍚 Makanan" },
         { value: "snack", label: "🍿 Snack" },
         { value: "ayam", label: "🍗 Ayam" },
         { value: "nugget", label: "🍤 Nugget" }
