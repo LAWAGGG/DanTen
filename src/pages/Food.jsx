@@ -72,7 +72,6 @@ export default function FoodList() {
 
                     <div className="absolute inset-0 bg-gradient-to-b from-orange-50/70 to-orange-200/60"></div>
 
-                    {/* Floating Elements */}
                     <motion.div
                         className="absolute hidden md:block top-20 left-7 md:top-20 md:left-100 text-4xl md:text-6xl"
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -161,7 +160,6 @@ export default function FoodList() {
                         </motion.div>
                     </motion.div>
 
-                    {/* Title */}
                     <motion.div
                         className="relative z-10"
                         initial={{ opacity: 0, y: 20 }}
@@ -212,7 +210,6 @@ export default function FoodList() {
                     </motion.div>
                 </div>
 
-                {/* Category Select */}
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -257,7 +254,6 @@ export default function FoodList() {
                 </motion.div>
             </header>
 
-            {/* Main Content */}
             <motion.main
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -265,15 +261,8 @@ export default function FoodList() {
                 className="relative z-10 max-w-6xl mx-auto px-4 py-8"
             >
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {filteredFoods.map((food, index) => (
+                    {filteredFoods.map((food) => (
                         <motion.div
-                            key={food.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                                delay: 1.5 + (index * 0.1),
-                                duration: 0.5
-                            }}
                             className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                         >
                             <Link to={`/food/${food.id}`}>
@@ -296,7 +285,7 @@ export default function FoodList() {
                                     </div>
 
                                     <div className="w-full bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold text-center">
-                                        🛒 Lihat Detail & Pesan
+                                        Lihat Detail
                                     </div>
                                 </div>
                             </Link>

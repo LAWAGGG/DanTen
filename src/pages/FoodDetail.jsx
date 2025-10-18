@@ -29,7 +29,6 @@ export default function FoodDetail() {
             });
     }, [id]);
 
-    // Function untuk extract harga dari string price
     const extractPrice = (priceString) => {
         const priceMatch = priceString.match(/Rp\s*([0-9.,]+)/);
         if (priceMatch) {
@@ -39,12 +38,10 @@ export default function FoodDetail() {
         return 0;
     };
 
-    // Function untuk format price menjadi angka
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID').format(price);
     };
 
-    // Function untuk menghitung total harga
     const calculateTotal = () => {
         if (!food) return 0;
         const price = extractPrice(food.price);
@@ -61,7 +58,6 @@ export default function FoodDetail() {
             return;
         }
 
-        // Validasi nomor telepon
         const phoneRegex = /^[0-9+\-\s()]{10,15}$/;
         if (!phoneRegex.test(orderData.nomor_telpon)) {
             alert('Format nomor telepon tidak valid!');
@@ -71,7 +67,6 @@ export default function FoodDetail() {
 
         const totalHarga = calculateTotal();
 
-        // Format data untuk dikirim ke Google Sheets
         const url = "https://script.google.com/macros/s/AKfycbzU6f5sawaOMOQifg4A1zddT1UaoDeDRBABIlXHWpb2Lbp8uOe7Bbwb-OqCP9IRf9gL/exec";
 
         const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}`;
@@ -79,7 +74,6 @@ export default function FoodDetail() {
         console.log("Mengirim data ke Google Sheets:", bodyData);
 
         try {
-            // Kirim ke Google Sheets
             const sheetResponse = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -91,10 +85,8 @@ export default function FoodDetail() {
             const result = await sheetResponse.text();
             console.log("Response dari Google Sheets:", result);
 
-            // Tampilkan modal sukses
             setShowSuccessModal(true);
 
-            // Reset form setelah delay
             setTimeout(() => {
                 setOrderData({
                     nama: '',
@@ -178,7 +170,6 @@ export default function FoodDetail() {
                 style={{ backgroundImage: "url('../Bg.png')" }}
             ></div>
 
-            {/* Header */}
             <header className="relative z-10 bg-white/80 backdrop-blur-md border-b border-orange-200 shadow-sm">
                 <div className="max-w-6xl mx-auto px-4 py-4">
                     <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold transition-colors">
@@ -187,7 +178,6 @@ export default function FoodDetail() {
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="relative z-10 max-w-4xl mx-auto px-4 py-8">
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
@@ -195,7 +185,6 @@ export default function FoodDetail() {
                     transition={{ delay: 0.2, duration: 0.6 }}
                     className="bg-white rounded-2xl shadow-xl overflow-hidden border border-orange-100"
                 >
-                    {/* Food Image */}
                     <div className="relative h-80 sm:h-96 bg-gray-100 overflow-hidden">
                         <motion.img
                             initial={{ scale: 1.1 }}
@@ -208,7 +197,6 @@ export default function FoodDetail() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
 
-                    {/* Food Info */}
                     <div className="p-6 border-b border-orange-100">
                         <div className="flex justify-between items-start mb-4">
                             <motion.h1
@@ -259,7 +247,6 @@ export default function FoodDetail() {
                         </motion.p>
                     </div>
 
-                    {/* Order Form */}
                     <div className="p-6">
                         <form onSubmit={handleSubmitOrder} className="space-y-6">
                             <motion.h2
@@ -271,7 +258,6 @@ export default function FoodDetail() {
                                 Form Pemesanan
                             </motion.h2>
 
-                            {/* Form Fields */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <motion.div
                                     initial={{ y: 10, opacity: 0 }}
@@ -330,7 +316,6 @@ export default function FoodDetail() {
                                     />
                                 </motion.div>
 
-                                {/* Jumlah Pesanan */}
                                 <motion.div
                                     initial={{ y: 10, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
@@ -343,7 +328,6 @@ export default function FoodDetail() {
                                         type="text"
                                         value={orderData.jumlah_pesanan}
                                         onChange={(e) => {
-                                            // Ambil hanya angka dari input
                                             const value = e.target.value.replace(/[^0-9]/g, "");
                                             setOrderData(prev => ({
                                                 ...prev,
@@ -358,7 +342,6 @@ export default function FoodDetail() {
 
                             </div>
 
-                            {/* Total Harga */}
                             <motion.div
                                 initial={{ y: 10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -376,7 +359,6 @@ export default function FoodDetail() {
                                 </p>
                             </motion.div>
 
-                            {/* Submit Button */}
                             <motion.div
                                 initial={{ y: 10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -400,7 +382,7 @@ export default function FoodDetail() {
                                             Memproses Pesanan...
                                         </>
                                     ) : (
-                                        '📱 Pesan Sekarang!'
+                                        'Pesan Sekarang!'
                                     )}
                                 </button>
                             </motion.div>
@@ -409,7 +391,6 @@ export default function FoodDetail() {
                 </motion.div>
             </main>
 
-            {/* Success Modal */}
             <AnimatePresence>
                 {showSuccessModal && (
                     <motion.div
@@ -457,7 +438,6 @@ export default function FoodDetail() {
                 )}
             </AnimatePresence>
 
-            {/* Footer */}
             <footer className="relative z-10 bg-orange-900 text-white text-center py-8 mt-12">
                 <div className="max-w-6xl mx-auto px-4">
                     <p className="text-orange-200 text-lg">
