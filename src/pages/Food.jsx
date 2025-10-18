@@ -116,7 +116,7 @@ export default function FoodList() {
                     </motion.div>
 
                     <motion.div
-                        className="absolute bottom-17 right-80 md:bottom-10 md:left-100 text-4xl md:text-6xl"
+                        className="absolute bottom-17 left-7 md:bottom-10 md:left-100 text-4xl md:text-6xl"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.7, duration: 0.8 }}
@@ -308,10 +308,10 @@ export default function FoodList() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.7, duration: 0.6 }}
-                className="relative z-10 bg-orange-900 text-white text-center py-8 mt-12"
+                className="relative z-10 bg-gradient-to-b from-orange-600 to-orange-800 text-white text-center py-8 mt-12"
             >
                 <div className="max-w-6xl mx-auto px-4">
-                    <p className="text-orange-200 text-lg mb-2">
+                    <p className="text-orange-200 font-medium text-lg mb-2">
                         &copy; 2025 OSIS 58 - Pendanaan
                     </p>
                 </div>

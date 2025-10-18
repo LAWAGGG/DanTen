@@ -109,9 +109,9 @@ export default function FoodDetail() {
         const totalHarga = calculateTotal();
         const description = food.description && food.description !== "null"
             ? food.description
-            : "Menu spesial dari DanTen";
+            : " ";
 
-        const message = `Halo! Saya mau pesan:\n\n *${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n• ${description}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
+        const message = `Halo! Saya mau pesan:\n\n *${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n${description}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
 
         const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");
@@ -185,7 +185,7 @@ export default function FoodDetail() {
                     transition={{ delay: 0.2, duration: 0.6 }}
                     className="bg-white rounded-2xl shadow-xl overflow-hidden border border-orange-100"
                 >
-                    <div className="relative h-80 sm:h-96 bg-gray-100 overflow-hidden">
+                    <div className="relative h-80 sm:h-105 bg-gray-100 overflow-hidden">
                         <motion.img
                             initial={{ scale: 1.1 }}
                             animate={{ scale: 1 }}
@@ -198,52 +198,34 @@ export default function FoodDetail() {
                     </div>
 
                     <div className="p-6 border-b border-orange-100">
-                        <div className="flex justify-between items-start mb-4">
-                            <motion.h1
+                        <div className="flex justify-between items-start mb-2">
+                            <motion.h2
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.3 }}
                                 className="text-3xl font-bold text-gray-800"
                             >
                                 {food.name}
-                            </motion.h1>
+                            </motion.h2>
                             <motion.span
                                 initial={{ x: 20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className="text-2xl font-bold text-orange-600 bg-orange-50 px-4 py-2 rounded-xl"
+                                className="text-xl font-bold text-orange-600 bg-orange-50 px-4 py-2 rounded-xl"
                             >
                                 {food.price}
                             </motion.span>
                         </div>
 
-                        {food.category && (
-                            <motion.div
-                                initial={{ y: 10, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.5 }}
-                                className="flex flex-wrap gap-2 mb-4"
-                            >
-                                {food.category.map((cat, index) => (
-                                    <span
-                                        key={index}
-                                        className="bg-orange-100 text-orange-700 text-sm px-3 py-1 rounded-full font-medium"
-                                    >
-                                        {cat}
-                                    </span>
-                                ))}
-                            </motion.div>
-                        )}
-
                         <motion.p
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.6 }}
-                            className="text-gray-600 text-lg leading-relaxed"
+                            className="text-gray-600 leading-relaxed"
                         >
                             {food.description && food.description !== "null"
                                 ? food.description
-                                : "Menu spesial DanTen yang dibuat dengan bahan-bahan fresh dan berkualitas. Cocok untuk teman belajar maupun santai bersama teman."}
+                                : "Menu DanTen yang memiliki bahan-bahan fresh dan berkualitas!"}
                         </motion.p>
                     </div>
 
@@ -255,7 +237,7 @@ export default function FoodDetail() {
                                 transition={{ delay: 0.7 }}
                                 className="text-2xl font-bold text-gray-800 border-b border-orange-200 pb-3"
                             >
-                                Form Pemesanan
+                                Pemesanan
                             </motion.h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -346,7 +328,7 @@ export default function FoodDetail() {
                                 initial={{ y: 10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 1.2 }}
-                                className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200"
+                                className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-2xl border border-orange-200"
                             >
                                 <div className="flex justify-between items-center text-xl font-bold">
                                     <span className="text-gray-800">Total Harga:</span>
@@ -354,9 +336,6 @@ export default function FoodDetail() {
                                         Rp {formatPrice(totalHarga)},-
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-2 text-center">
-                                    {orderData.jumlah_pesanan} pcs × {food.price}
-                                </p>
                             </motion.div>
 
                             <motion.div
@@ -438,13 +417,18 @@ export default function FoodDetail() {
                 )}
             </AnimatePresence>
 
-            <footer className="relative z-10 bg-orange-900 text-white text-center py-8 mt-12">
+            <motion.footer
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="relative z-10 bg-gradient-to-b from-orange-600 to-orange-800 text-white text-center py-8 mt-12"
+            >
                 <div className="max-w-6xl mx-auto px-4">
-                    <p className="text-orange-200 text-lg">
+                    <p className="text-orange-200 font-medium text-lg mb-2">
                         &copy; 2025 OSIS 58 - Pendanaan
                     </p>
                 </div>
-            </footer>
+            </motion.footer>
         </motion.div>
     );
 }
