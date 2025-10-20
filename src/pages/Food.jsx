@@ -8,17 +8,35 @@ export default function FoodList() {
     const [selectedCategory, setSelectedCategory] = useState("all");
 
     useEffect(() => {
-        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json")
-            .then((response) => response.json())
-            .then((data) => {
-                setFoods(data);
+        const url = "https://docs.google.com/spreadsheets/d/1Iza2Ys74RNG_x5WjHW8QcqxXlhD0ldqwuxHFra05jIY/gviz/tq?tqx=out:json";
+
+        fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const jsonText = text
+                    .replace(/^[^\(]*\(/, "")
+                    .replace(/\);?$/, "");
+                const json = JSON.parse(jsonText);
+
+                const cols = json.table.cols.map(col => col.label);
+                const rows = json.table.rows.map((row, index) => {
+                    const obj = {};
+                    row.c.forEach((cell, i) => {
+                        obj[cols[i]] = cell ? cell.v : null;
+                    });
+                    obj.id = index;
+                    return obj;
+                });
+
+                setFoods(rows);
                 setLoading(false);
             })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
+            .catch(error => {
+                console.error("Error fetch spreadsheet:", error);
                 setLoading(false);
             });
     }, []);
+
 
     const categories = [
         { value: "all", label: "🍽️ Semua Menu" },

@@ -16,15 +16,33 @@ export default function FoodDetail() {
     });
 
     useEffect(() => {
-        fetch("https://lawaggg.github.io/DanTenAPI/api/foods.json")
-            .then((response) => response.json())
-            .then((data) => {
-                const selectedFood = data.find(item => item.id === id);
-                setFood(selectedFood);
+        const url =
+            "https://docs.google.com/spreadsheets/d/1Iza2Ys74RNG_x5WjHW8QcqxXlhD0ldqwuxHFra05jIY/gviz/tq?tqx=out:json";
+
+        fetch(url)
+            .then(res => res.text())
+            .then(text => {
+                const jsonText = text
+                    .replace(/^[^\(]*\(/, "")
+                    .replace(/\);?$/, "");
+                const json = JSON.parse(jsonText);
+
+                const cols = json.table.cols.map(col => col.label);
+                const rows = json.table.rows.map((row, index) => {
+                    const obj = {};
+                    row.c.forEach((cell, i) => {
+                        obj[cols[i]] = cell ? cell.v : null;
+                    });
+                    obj.id = index; 
+                    return obj;
+                });
+
+                const selected = rows.find(item => String(item.id) === String(id));
+                setFood(selected);
                 setLoading(false);
             })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
+            .catch(err => {
+                console.error("Error fetching detail:", err);
                 setLoading(false);
             });
     }, [id]);
