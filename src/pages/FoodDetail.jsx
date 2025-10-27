@@ -12,6 +12,7 @@ export default function FoodDetail() {
         nama: '',
         kelas: '',
         nomor_telpon: '',
+        notes: '',
         jumlah_pesanan: 1
     });
 
@@ -33,7 +34,7 @@ export default function FoodDetail() {
                     row.c.forEach((cell, i) => {
                         obj[cols[i]] = cell ? cell.v : null;
                     });
-                    obj.id = index; 
+                    obj.id = index;
                     return obj;
                 });
 
@@ -87,7 +88,7 @@ export default function FoodDetail() {
 
         const url = "https://script.google.com/macros/s/AKfycbzU6f5sawaOMOQifg4A1zddT1UaoDeDRBABIlXHWpb2Lbp8uOe7Bbwb-OqCP9IRf9gL/exec";
 
-        const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}`;
+        const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}&notes=${orderData.notes}`;
 
         console.log("Mengirim data ke Google Sheets:", bodyData);
 
@@ -110,6 +111,7 @@ export default function FoodDetail() {
                     nama: '',
                     kelas: '',
                     nomor_telpon: '',
+                    notes: '',
                     jumlah_pesanan: 1
                 });
                 setSubmitting(false);
@@ -128,8 +130,8 @@ export default function FoodDetail() {
         const description = food.description && food.description !== "null"
             ? food.description
             : " ";
-
-        const message = `Halo! Saya mau pesan:\n\n *${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n${description}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
+        const notesText = orderData.notes && orderData.notes.trim() !== "" ? orderData.notes : "-";
+        const message = `Halo! Saya mau pesan:\n\n*${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n${description}\n• Notes/Request: ${notesText}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
 
         const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");
@@ -337,6 +339,24 @@ export default function FoodDetail() {
                                         placeholder="Masukkan jumlah pesanan"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                         required
+                                    />
+                                </motion.div>
+                                <motion.div
+                                    initial={{ y: 10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 1.0 }}
+                                >
+                                    <label className="block text-gray-700 font-semibold mb-2">
+                                        Notes/Catatan *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={orderData.notes}
+                                        onChange={(e) => handleInputChange('notes', e.target.value)}
+                                        placeholder="Untuk memilih jenis varian makanan (jika ada)"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
+                                        required
+                                        disabled={submitting}
                                     />
                                 </motion.div>
 

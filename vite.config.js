@@ -7,7 +7,4 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ]
-  // allowedHosts:[
-  //   'https://script.google.com/macros/s/AKfycbwdvpG6hlaKjLt1U5pcYhCMGl36k81WJEalTqp3UQGuAEZc2V_O7FQGYneFporcEcd1og/exec'
-  // ]
 })
