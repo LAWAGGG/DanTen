@@ -353,7 +353,7 @@ export default function FoodDetail() {
                                         type="text"
                                         value={orderData.notes}
                                         onChange={(e) => handleInputChange('notes', e.target.value)}
-                                        placeholder="Untuk memilih jenis varian makanan (jika ada)"
+                                        placeholder="Jenis varian makanan (jika ada)"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                                         required
                                         disabled={submitting}
