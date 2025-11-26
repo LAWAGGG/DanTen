@@ -13,8 +13,11 @@ export default function FoodDetail() {
         kelas: '',
         nomor_telpon: '',
         notes: '',
-        jumlah_pesanan: 1
+        jumlah_pesanan: 1,
+        tipe_pembayaran: '',
     });
+
+    const [showQRISModal, setShowQRISModal] = useState(false);
 
     useEffect(() => {
         const url =
@@ -71,6 +74,16 @@ export default function FoodDetail() {
         e.preventDefault();
         setSubmitting(true);
 
+        // Di dalam handleSubmitOrder, tambahkan validasi tipe_pembayaran
+        if (!orderData.nama.trim() || !orderData.kelas.trim() || !orderData.nomor_telpon.trim() || !orderData.tipe_pembayaran) {
+            alert('Silakan lengkapi semua data termasuk tipe pembayaran!');
+            setSubmitting(false);
+            return;
+        }
+
+        // Update kondisi disabled button
+        // disabled={!orderData.nama.trim() || !orderData.kelas.trim() || !orderData.nomor_telpon.trim() || !orderData.tipe_pembayaran || submitting}
+
         if (!orderData.nama.trim() || !orderData.kelas.trim() || !orderData.nomor_telpon.trim()) {
             alert('Silakan lengkapi semua data!');
             setSubmitting(false);
@@ -88,8 +101,7 @@ export default function FoodDetail() {
 
         const url = "https://script.google.com/macros/s/AKfycbzU6f5sawaOMOQifg4A1zddT1UaoDeDRBABIlXHWpb2Lbp8uOe7Bbwb-OqCP9IRf9gL/exec";
 
-        const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}&notes=${orderData.notes}`;
-
+        const bodyData = `timestamp=${encodeURIComponent(new Date().toLocaleString('id-ID'))}&nama=${encodeURIComponent(orderData.nama)}&kelas=${encodeURIComponent(orderData.kelas)}&nomor_telpon=${encodeURIComponent(orderData.nomor_telpon)}&makanan=${encodeURIComponent(food.name)}&jumlah_pesanan=${orderData.jumlah_pesanan}&total_harga=${totalHarga}&notes=${encodeURIComponent(orderData.notes)}&tipe_pembayaran=${encodeURIComponent(orderData.tipe_pembayaran)}`;
         console.log("Mengirim data ke Google Sheets:", bodyData);
 
         try {
@@ -131,7 +143,9 @@ export default function FoodDetail() {
             ? food.description
             : " ";
         const notesText = orderData.notes && orderData.notes.trim() !== "" ? orderData.notes : "-";
-        const message = `Halo! Saya mau pesan:\n\n*${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n${description}\n• Notes/Request: ${notesText}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
+        const paymentMethod = orderData.tipe_pembayaran === 'qris' ? 'QRIS (berikan bukti tf)' : 'Cash';
+
+        const message = `Halo! Saya mau pesan:\n\n*${food.name}*\n• Jumlah: ${orderData.jumlah_pesanan} pcs\n• Total: Rp ${formatPrice(totalHarga)},-\n• Metode Bayar: ${paymentMethod}\n${description}\n• Notes/Request: ${notesText}\n\n• *Pemesan:*\nNama: ${orderData.nama}\nKelas: ${orderData.kelas}\nTelpon: ${orderData.nomor_telpon}\n\n_*[ORDER DANTEN]*_`;
 
         const whatsappUrl = `https://wa.me/6283856278811?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, "_blank");
@@ -359,8 +373,46 @@ export default function FoodDetail() {
                                         disabled={submitting}
                                     />
                                 </motion.div>
-
                             </div>
+
+                            <motion.div
+                                initial={{ y: 10, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 1.1 }}
+                                className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-2xl border border-orange-200"
+                            >
+                                <label className="block text-gray-700 font-semibold mb-3">
+                                    Tipe Pembayaran *
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            handleInputChange('tipe_pembayaran', 'cash');
+                                            setShowQRISModal(false);
+                                        }}
+                                        className={`py-3 px-4 rounded-xl font-semibold transition-all duration-200 border-2 ${orderData.tipe_pembayaran === 'cash'
+                                            ? 'bg-green-500 text-white border-green-600 shadow-lg'
+                                            : 'bg-white text-gray-700 border-orange-300 hover:bg-orange-50'
+                                            }`}
+                                    >
+                                        💵 Cash
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            handleInputChange('tipe_pembayaran', 'qris');
+                                            setShowQRISModal(true);
+                                        }}
+                                        className={`py-3 px-4 rounded-xl font-semibold transition-all duration-200 border-2 ${orderData.tipe_pembayaran === 'qris'
+                                            ? 'bg-blue-500 text-white border-blue-600 shadow-lg'
+                                            : 'bg-white text-gray-700 border-orange-300 hover:bg-orange-50'
+                                            }`}
+                                    >
+                                        📱 QRIS
+                                    </button>
+                                </div>
+                            </motion.div>
 
                             <motion.div
                                 initial={{ y: 10, opacity: 0 }}
@@ -450,6 +502,55 @@ export default function FoodDetail() {
                             >
                                 Konfirmasi ke WhatsApp
                             </motion.button>
+                        </motion.div>
+                    </motion.div>
+                )}
+
+                {showQRISModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center"
+                        >
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">
+                                QR Code Pembayaran
+                            </h3>
+
+                            <div className="bg-gray-100 p-4 rounded-xl mb-4">
+                                <img
+                                    src="../qris.png"
+                                    alt="QRIS Payment"
+                                    className="w-full h-auto rounded-lg mx-auto"
+                                />
+                            </div>
+
+                            <p className="text-gray-600 text-sm mb-4">
+                                Scan QR code di atas untuk melakukan pembayaran
+                            </p>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowQRISModal(false)}
+                                    className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                                >
+                                    Tutup
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShowQRISModal(false);
+                                    }}
+                                    className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition-colors"
+                                >
+                                    Sudah Bayar
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
